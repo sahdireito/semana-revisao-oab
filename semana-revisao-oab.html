@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana de Revisão OAB | Prof. Caqui 🍊</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f4f0;font-family:'DM Sans',sans-serif;color:#1a1a1a;min-height:100vh}
+
+/* HERO */
+.hero{background:#0D2B5E;padding:2rem 1.5rem 1.5rem;text-align:center}
+.hero-badge{display:inline-block;background:#F26522;color:#fff;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;padding:4px 14px;border-radius:20px;margin-bottom:.75rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:28px;color:#fff;line-height:1.2;margin-bottom:.5rem}
+.hero p{font-size:13px;color:rgba(255,255,255,.65);max-width:500px;margin:0 auto 1.25rem}
+.hero-stats{display:flex;justify-content:center;gap:2rem}
+.hs{text-align:center}
+.hs-n{font-size:22px;font-weight:500;color:#F26522}
+.hs-l{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em}
+
+/* PROGRESS GLOBAL */
+.gbar-wrap{background:#0a2050;height:6px}
+.gbar{height:6px;background:#F26522;transition:width .4s;width:0%}
+
+/* NAV DIAS */
+.day-nav{background:#fff;border-bottom:1px solid #e8e8e5;padding:.75rem 1rem;display:flex;gap:6px;overflow-x:auto;position:sticky;top:0;z-index:50}
+.day-nav::-webkit-scrollbar{height:3px}
+.day-nav::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+.dnb{background:transparent;border:1px solid #ddd;border-radius:20px;padding:5px 13px;font-size:12px;cursor:pointer;color:#555;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.dnb:hover{background:#f5f4f0}
+.dnb.active{background:#0D2B5E;color:#fff;border-color:#0D2B5E}
+.dnb.done{background:#EAF3DE;color:#27500A;border-color:#97C459}
+
+/* LAYOUT */
+.container{max-width:860px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+/* DAY PANEL */
+.day-panel{display:none}
+.day-panel.visible{display:block}
+
+.day-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
+.day-title-group{}
+.day-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#F26522;margin-bottom:.25rem}
+.day-title{font-family:'Playfair Display',serif;font-size:22px;color:#1a1a1a}
+.day-date{font-size:13px;color:#888;margin-top:.2rem}
+.day-prog-wrap{text-align:right}
+.day-prog-label{font-size:11px;color:#888;margin-bottom:4px}
+.day-prog-ring{width:52px;height:52px;position:relative;display:inline-block}
+.day-prog-ring svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:#e8e8e5;stroke-width:5}
+.ring-fg{fill:none;stroke:#F26522;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .4s}
+.ring-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:500;color:#1a1a1a}
+
+/* MATÉRIA BLOCK */
+.materia-block{background:#fff;border-radius:14px;border:1px solid #e0dfd8;margin-bottom:1rem;overflow:hidden}
+.materia-header{padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.materia-header:hover{background:#faf9f7}
+.mh-left{display:flex;align-items:center;gap:10px}
+.mat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.mat-trab{background:#E6F1FB;color:#0C447C}
+.mat-pen{background:#FCEBEB;color:#791F1F}
+.mat-const{background:#EEEDFE;color:#3C3489}
+.mat-trib{background:#FAEEDA;color:#633806}
+.mat-adm{background:#EAF3DE;color:#27500A}
+.mat-proc{background:#F1EFE8;color:#444441}
+.mat-rest{background:#FBEAF0;color:#72243E}
+.mat-name{font-size:14px;font-weight:500;color:#1a1a1a}
+.mat-sub{font-size:12px;color:#888;margin-top:1px}
+.mat-check-count{font-size:11px;color:#888;background:#f5f4f0;padding:3px 9px;border-radius:10px;white-space:nowrap}
+.mat-chevron{font-size:16px;color:#aaa;transition:transform .2s;flex-shrink:0}
+.mat-chevron.open{transform:rotate(180deg)}
+.materia-body{display:none;border-top:1px solid #e8e8e5}
+.materia-body.open{display:block}
+
+/* EXPLICACAO */
+.explicacao{background:#faf9f7;padding:1.1rem 1.25rem;border-bottom:1px solid #e8e8e5}
+.exp-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#F26522;margin-bottom:.6rem}
+.exp-text{font-size:13.5px;line-height:1.7;color:#333}
+.exp-text strong{font-weight:500;color:#0D2B5E}
+.analogia-box{background:#EAF3DE;border-radius:8px;padding:.7rem 1rem;margin-top:.75rem;display:flex;gap:8px;align-items:flex-start}
+.analogia-icon{font-size:15px;color:#3B6D11;flex-shrink:0;margin-top:1px}
+.analogia-text{font-size:12.5px;color:#27500A;line-height:1.5}
+.lei-box{background:#E6F1FB;border-radius:8px;padding:.6rem 1rem;margin-top:.6rem}
+.lei-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:#0C447C;margin-bottom:.25rem}
+.lei-text{font-size:12px;color:#185FA5;line-height:1.45}
+
+/* CHECKLIST */
+.checklist{padding:.75rem 1.25rem 1rem}
+.cl-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:.6rem}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:.45rem 0;border-bottom:.5px solid #f0efe9;cursor:pointer}
+.cl-item:last-child{border-bottom:none}
+.cl-item:hover .cl-box{border-color:#F26522}
+.cl-box{width:18px;height:18px;border:1.5px solid #ccc;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.cl-box.checked{background:#0D2B5E;border-color:#0D2B5E}
+.cl-box.checked::after{content:'';width:10px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
+.cl-text{font-size:13.5px;color:#1a1a1a;line-height:1.45;flex:1}
+.cl-text.done{color:#aaa;text-decoration:line-through}
+
+/* FLASHCARDS */
+.fc-section{padding:.75rem 1.25rem 1.25rem}
+.fc-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:.75rem}
+.fc-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.fc-counter{font-size:12px;color:#888}
+.fc-btn{background:transparent;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#555;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px}
+.fc-btn:hover{background:#f5f4f0}
+.fc-scene{perspective:900px;width:100%;height:170px;cursor:pointer;user-select:none}
+.fc-inner{width:100%;height:100%;transition:transform .4s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.fc-scene.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px;border:1px solid #e0dfd8;padding:1rem;display:flex;flex-direction:column;justify-content:center;background:#fff}
+.fc-face.fc-back{transform:rotateY(180deg);background:#0D2B5E}
+.fc-q{font-size:13.5px;font-weight:500;color:#1a1a1a;text-align:center;line-height:1.5}
+.fc-hint{font-size:10px;color:#bbb;text-align:center;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:3px}
+.fc-a-label{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#F26522;margin-bottom:.35rem}
+.fc-a{font-size:12.5px;color:#fff;line-height:1.55;flex:1;overflow:auto}
+.fc-fund{font-size:11px;color:rgba(255,255,255,.5);margin-top:.5rem;line-height:1.3}
+.fc-nav{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem}
+.fc-nav-btn{background:transparent;border:1px solid #ddd;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;color:#555;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px}
+.fc-nav-btn:hover{background:#f5f4f0}
+.fc-nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.fc-mark{display:flex;gap:6px}
+.fc-yes{background:#EAF3DE;color:#27500A;border-color:#97C459;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;border-width:1px;display:flex;align-items:center;gap:4px}
+.fc-yes:hover{background:#C0DD97}
+.fc-no{background:#FCEBEB;color:#791F1F;border-color:#F09595;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;border-width:1px;display:flex;align-items:center;gap:4px}
+.fc-no:hover{background:#F7C1C1}
+
+/* DESCANSO / SIMULADO */
+.special-card{background:#fff;border-radius:14px;border:1px solid #e0dfd8;padding:2rem;text-align:center;margin-bottom:1rem}
+.special-icon{font-size:40px;color:#F26522;margin-bottom:.75rem}
+.special-title{font-family:'Playfair Display',serif;font-size:20px;color:#1a1a1a;margin-bottom:.5rem}
+.special-text{font-size:13.5px;color:#666;line-height:1.6;max-width:420px;margin:0 auto 1rem}
+.special-tips{text-align:left;background:#faf9f7;border-radius:10px;padding:1rem;max-width:420px;margin:0 auto}
+.tip-item{display:flex;gap:8px;align-items:flex-start;padding:.3rem 0;font-size:13px;color:#444;line-height:1.4}
+.tip-dot{width:6px;height:6px;background:#F26522;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* FOOTER */
+.footer{background:#0D2B5E;padding:1.5rem;text-align:center;margin-top:2rem}
+.footer h3{font-family:'Playfair Display',serif;font-size:17px;color:#fff;margin-bottom:.35rem}
+.footer p{font-size:12.5px;color:rgba(255,255,255,.55);margin-bottom:.9rem}
+.footer a{background:#F26522;color:#fff;text-decoration:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:500;display:inline-block}
+
+@media(max-width:520px){
+  .hero h1{font-size:22px}
+  .container{padding:1rem .75rem 3rem}
+  .day-nav{padding:.6rem .75rem}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">🍊 Prof. Caqui — Desafio 90 Dias OAB</div>
+  <h1>Semana de Revisão / Repor Matéria</h1>
+  <p>15 a 21 de junho · Checklist diário, explicações didáticas e flashcards por tema</p>
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-n" id="g-done">0</div><div class="hs-l">itens revisados</div></div>
+    <div class="hs"><div class="hs-n" id="g-total">0</div><div class="hs-l">total</div></div>
+    <div class="hs"><div class="hs-n" id="g-pct">0%</div><div class="hs-l">progresso</div></div>
+  </div>
+</div>
+<div class="gbar-wrap"><div class="gbar" id="gbar"></div></div>
+
+<div class="day-nav" id="day-nav">
+  <button class="dnb active" data-day="0">Seg 15/06</button>
+  <button class="dnb" data-day="1">Ter 16/06</button>
+  <button class="dnb" data-day="2">Qua 17/06</button>
+  <button class="dnb" data-day="3">Qui 18/06</button>
+  <button class="dnb" data-day="4">Sex 19/06</button>
+  <button class="dnb" data-day="5">Sáb 20/06</button>
+  <button class="dnb" data-day="6">Dom 21/06</button>
+</div>
+
+<div class="container" id="main-container"></div>
+
+<script>
+const DAYS = [
+  {
+    label:'Segunda-feira', date:'15/06', title:'Processo do Trabalho',
+    materias:[
+      {
+        id:'trab-rec', name:'Direito do Trabalho', sub:'Recursos trabalhistas',
+        icon:'ti-briefcase', cls:'mat-trab',
+        exp:`<strong>Recursos no Processo do Trabalho</strong> são os meios de impugnação das decisões judiciais dentro da Justiça do Trabalho. Pense nos recursos como as "apelações" que o jogador pode fazer ao árbitro — mas com regras e prazos bem específicos.<br><br>
+O prazo padrão é de <strong>8 dias</strong> para quase todos os recursos (diferente do processo civil, onde o prazo é 15 dias). Os embargos de declaração têm prazo de <strong>5 dias</strong> e <strong>interrompem</strong> (não suspendem) os demais prazos.<br><br>
+O <strong>depósito recursal</strong> é exclusivo do reclamado e funciona como garantia do juízo — sem ele, o recurso não é conhecido. Microempresas, EPP, Fazenda Pública e entidades filantrópicas são isentas.`,
+        analogia:`Imagine que o depósito recursal é como a entrada de um condomínio: sem pagar, o portão não abre. Não importa o quanto você queira entrar — sem o depósito, o recurso fica do lado de fora.`,
+        lei:`Art. 895, 896 e 899 CLT · Súmula 245 e 128 TST · Lei 13.467/2017`,
+        checklist:[
+          'Sei diferenciar RO, RR e Agravo de Instrumento',
+          'Conheço o prazo de 8 dias para recursos e 5 dias para ED',
+          'Sei que ED interrompem (não suspendem) o prazo',
+          'Conheço os isentos do depósito recursal',
+          'Sei que no TST não cabe jus postulandi (Súmula 425)',
+        ],
+        cards:[
+          {q:'Qual o prazo para o Recurso Ordinário e para onde ele vai?',a:'8 dias. Da sentença da Vara → TRT. Do acórdão do TRT (competência originária) → TST.',f:'Art. 895 CLT'},
+          {q:'O que é o depósito recursal e quem está isento?',a:'Pressuposto extrínseco de admissibilidade do recurso do reclamado. Isentos: Fazenda Pública, MPT, massa falida, entidades filantrópicas, ME e EPP.',f:'Art. 899 CLT; Súmula 128 TST'},
+          {q:'Qual o efeito dos embargos de declaração sobre os demais prazos?',a:'Interrompem (não suspendem) o prazo dos demais recursos — o prazo recomeça do zero após a intimação do acórdão dos ED.',f:'Art. 897-A CLT'},
+          {q:'O Recurso de Revista cabe para reexame de provas?',a:'Não. A Súmula 126 do TST veda o reexame de provas no RR. Só cabe por violação de lei federal, CF ou divergência jurisprudencial.',f:'Art. 896 CLT; Súmula 126 TST'},
+        ]
+      },
+      {
+        id:'trab-diss', name:'Processo do Trabalho', sub:'Dissídio individual',
+        icon:'ti-scale', cls:'mat-trab',
+        exp:`O <strong>dissídio individual</strong> é o nome técnico da reclamação trabalhista — a ação ajuizada pelo empregado (ou empregador) para resolver conflito individual de trabalho. É como o "processo comum" do trabalhador.<br><br>
+Tem dois ritos principais: <strong>ordinário</strong> (sem limite de valor) e <strong>sumaríssimo</strong> (até 40 salários mínimos, exceto Fazenda Pública). No sumaríssimo, a petição inicial deve conter o <strong>endereço do reclamado</strong> sob pena de arquivamento.<br><br>
+A <strong>audiência una</strong> concentra tudo num só ato: tentativa de conciliação (obrigatória no início e no fim), defesa, instrução e sentença. Se o reclamado não comparece → <strong>revelia</strong> com confissão ficta.`,
+        analogia:`O dissídio individual é como um "Whatsapp" direto com a Justiça do Trabalho: vai direto ao ponto, em uma única conversa (audiência una) que resolve tudo — ou quase tudo — de uma vez.`,
+        lei:`Arts. 836, 843, 844, 852-A CLT · Súmula 74 TST (revelia) · Súmula 263 TST`,
+        checklist:[
+          'Sei o que é dissídio individual e suas espécies',
+          'Conheço a diferença entre rito ordinário e sumaríssimo',
+          'Sei a consequência da falta do endereço no sumaríssimo',
+          'Entendo os efeitos da revelia na JT',
+          'Sei que a conciliação é obrigatória em dois momentos',
+        ],
+        cards:[
+          {q:'Qual o limite de valor para o rito sumaríssimo na JT?',a:'Causas até 40 salários mínimos, excluídas as que envolvem a Fazenda Pública.',f:'Art. 852-A CLT'},
+          {q:'O que ocorre se a petição inicial no sumaríssimo não tiver o endereço do reclamado?',a:'Arquivamento (extinção sem resolução do mérito). O juiz não determina emenda — arquiva de plano.',f:'Art. 852-B CLT; Súmula 263 TST'},
+          {q:'Quais são os dois momentos obrigatórios de tentativa de conciliação na audiência trabalhista?',a:'No início da audiência (antes da defesa) e ao final da instrução, antes da sentença.',f:'Arts. 846 e 850 CLT'},
+          {q:'A revelia na JT gera quais efeitos?',a:'Confissão ficta — presunção relativa de veracidade dos fatos narrados na reclamação. Não gera confissão quanto ao direito.',f:'Art. 844 CLT; Súmula 74 TST'},
+        ]
+      }
+    ]
+  },
+  {
+    label:'Terça-feira', date:'16/06', title:'Direito do Trabalho + Penal',
+    materias:[
+      {
+        id:'trab-sal', name:'Direito do Trabalho', sub:'Salário e Remuneração',
+        icon:'ti-coin', cls:'mat-trab',
+        exp:`<strong>Salário</strong> é a contraprestação paga diretamente pelo empregador. <strong>Remuneração</strong> é o gênero: salário + gorjetas e vantagens de terceiros. É uma distinção como a diferença entre o salário base e o contracheque completo.<br><br>
+Integram o salário: comissões, gratificações habituais, horas extras habituais, adicional noturno habitual, adicionais de insalubridade e periculosidade. <strong>Não integram:</strong> diárias de viagem até 50% do salário, ajuda de custo, benefícios previdenciários.<br><br>
+<strong>Gorjetas</strong> integram a remuneração com reflexo em férias, 13º, FGTS e aviso prévio — mas <strong>não</strong> incidem sobre adicional noturno, horas extras e DSR (Súmula 354 TST).`,
+        analogia:`Pense assim: salário é o prato principal. Remuneração é o cardápio completo (prato + sobremesa + gorjeta). Mas nem tudo que vai à mesa entra na conta final — a lei define o que "conta" para cada cálculo.`,
+        lei:`Arts. 457 e 458 CLT · Súmula 354 TST (gorjetas) · Lei 13.419/2017 (gorjetas)`,
+        checklist:[
+          'Sei distinguir salário de remuneração',
+          'Conheço as verbas que integram o salário',
+          'Sei que gorjetas integram a remuneração mas não incidem sobre HE e adicional noturno',
+          'Conheço o conceito de salário in natura (utilidades)',
+          'Sei o que são utilidades não salariais (vale-transporte, vale-alimentação)',
+        ],
+        cards:[
+          {q:'Gorjetas integram o salário ou a remuneração? Qual o reflexo?',a:'Integram a remuneração. Reflexo em: férias + 1/3, 13º salário, FGTS e aviso prévio. Não incidem sobre HE, adicional noturno e DSR.',f:'Súmula 354 TST; Lei 13.419/2017'},
+          {q:'O vale-transporte tem natureza salarial?',a:'Não. O vale-transporte não tem natureza salarial nem constitui base de incidência de FGTS e encargos. É utilidade não salarial.',f:'Lei 7.418/1985; art. 458, §2º CLT'},
+          {q:'O que são utilidades salariais e qual o limite para descontos?',a:'Utilidades fornecidas pelo empregador com natureza de contraprestação (habitação, alimentação in natura, etc.). O desconto por moradia não pode superar 25% e por alimentação 20% do salário.',f:'Art. 458 CLT'},
+          {q:'A gratificação habitual pode ser suprimida pelo empregador?',a:'Não. Incorporada por habitualidade, integra o contrato. A supressão viola o art. 468 CLT (condição mais benéfica) e gera direito à diferença.',f:'Art. 468 CLT; Súmula 209 TST'},
+        ]
+      },
+      {
+        id:'pen-pat', name:'Direito Penal', sub:'Crimes contra o Patrimônio',
+        icon:'ti-shield-x', cls:'mat-pen',
+        exp:`Os <strong>crimes contra o patrimônio</strong> (Título II do CP, arts. 155-183) são os mais cobrados na 1ª fase OAB e frequentes na 2ª. O núcleo é a proteção da propriedade e posse.<br><br>
+<strong>Furto (art. 155):</strong> subtração sem violência/grave ameaça. Furto qualificado (art. 155, §4º): rompimento de obstáculo, abuso de confiança, fraude, escalada, destreza, concurso de pessoas. Furto privilegiado: réu primário + coisa de pequeno valor → pena pode ser substituída.<br><br>
+<strong>Roubo (art. 157):</strong> subtração com violência ou grave ameaça. Latrocínio (art. 157, §3º, II): morte consumada → crime hediondo, competência do júri se dolosa.<br><br>
+<strong>Estelionato (art. 171):</strong> fraude para obter vantagem ilícita. Ação penal pública condicionada (regra) após Lei 13.964/2019.`,
+        analogia:`Furto é pegar sem que ninguém veja. Roubo é pegar olhando nos olhos e ameaçando. Estelionato é convencer a pessoa a entregar. A diferença está no método — e o método muda tudo na pena.`,
+        lei:`Arts. 155 a 183 CP · Lei 13.964/2019 (Pacote Anticrime) · Súmula 442 STJ (furto privilegiado)`,
+        checklist:[
+          'Sei distinguir furto simples, qualificado e privilegiado',
+          'Sei os elementos que qualificam o roubo (art. 157, §2º)',
+          'Conheço o conceito de latrocínio e sua competência',
+          'Sei que estelionato é ação pública condicionada (regra pós-2019)',
+          'Conheço a receptação dolosa e culposa (art. 180 CP)',
+        ],
+        cards:[
+          {q:'Qual a diferença entre furto e roubo?',a:'Furto (art. 155): subtração sem violência/grave ameaça. Roubo (art. 157): subtração com violência ou grave ameaça à pessoa, ou após reduzir resistência.',f:'Arts. 155 e 157 CP'},
+          {q:'O que é latrocínio e qual o tribunal competente?',a:'Roubo seguido de morte (art. 157, §3º, II CP). Crime hediondo. Se a morte for dolosa, competência do Tribunal do Júri; se culposa, juiz singular.',f:'Art. 157, §3º CP; Súmula 603 STF'},
+          {q:'Após a Lei 13.964/2019, qual a ação penal para o estelionato?',a:'Pública condicionada à representação da vítima (regra). Exceções: vítima vulnerável, sem representação necessária, ou estelionato contra a administração pública.',f:'Art. 171, §5º CP; Lei 13.964/2019'},
+          {q:'O que é o furto privilegiado (furto mínimo)?',a:'Réu primário com coisa de pequeno valor: juiz pode substituir pena de reclusão por detenção, diminuí-la de 1 a 2/3 ou aplicar multa (art. 155, §2º). Cabível também no furto qualificado (Súmula 511 STJ).',f:'Art. 155, §2º CP; Súmula 511 STJ'},
+        ]
+      }
+    ]
+  },
+  {
+    label:'Quarta-feira', date:'17/06', title:'Direito Constitucional',
+    materias:[
+      {
+        id:'const-dir', name:'D. Constitucional', sub:'Direitos e Garantias Fundamentais',
+        icon:'ti-file-certificate', cls:'mat-const',
+        exp:`Os <strong>direitos e garantias fundamentais</strong> estão no Título II da CF/88 (arts. 5º a 17) e são o coração da Constituição. Direitos são bens jurídicos protegidos; garantias são os instrumentos para assegurá-los.<br><br>
+<strong>Características:</strong> universalidade, indivisibilidade, imprescritibilidade, irrenunciabilidade e eficácia horizontal (vinculam particulares, não só o Estado).<br><br>
+<strong>Remédios constitucionais do art. 5º:</strong><br>
+• <strong>Habeas corpus</strong> — liberdade de locomoção ameaçada ou violada<br>
+• <strong>Mandado de segurança</strong> — direito líquido e certo, ato de autoridade, não amparado por HC ou HD<br>
+• <strong>Mandado de injunção</strong> — omissão normativa que inviabiliza direito constitucional<br>
+• <strong>Habeas data</strong> — acesso/retificação de dados em registros públicos<br>
+• <strong>Ação popular</strong> — cidadão anula ato lesivo ao patrimônio público`,
+        analogia:`Pense nos direitos fundamentais como a "planta baixa" da casa: definem o espaço de cada um. Os remédios constitucionais são as ferramentas para quando alguém quebra essa planta — cada ferramenta serve para um tipo de problema.`,
+        lei:`Arts. 5º a 17 CF/88 · Lei 12.016/2009 (MS) · Lei 9.507/1997 (HD) · Lei 4.717/1965 (Ação Popular)`,
+        checklist:[
+          'Sei distinguir direitos e garantias fundamentais',
+          'Conheço os 5 remédios constitucionais e seus usos',
+          'Entendo a eficácia horizontal dos direitos fundamentais',
+          'Sei as diferenças entre MS individual e coletivo',
+          'Conheço o prazo decadencial do MS (120 dias)',
+        ],
+        cards:[
+          {q:'Qual o remédio constitucional cabível para proteger a liberdade de locomoção?',a:'Habeas corpus (art. 5º, LXVIII CF). Gratuito, sem advogado obrigatório, dispensa formalidades. Cabível preventivo (salvo-conduto) ou repressivo (liberatório).',f:'Art. 5º, LXVIII CF/88'},
+          {q:'Qual o prazo para impetrar mandado de segurança?',a:'120 dias contados da ciência do ato impugnado pelo interessado (prazo decadencial, não interrompido por recurso administrativo).',f:'Art. 23 Lei 12.016/2009'},
+          {q:'O que é mandado de injunção e quando cabe?',a:'Cabe quando a falta de norma regulamentadora torna inviável o exercício de direito constitucional. O STF pode concretizar o direito (efeitos erga omnes após MI coletivo).',f:'Art. 5º, LXXI CF/88; Lei 13.300/2016'},
+          {q:'Quem pode propor ação popular e o que ela protege?',a:'Qualquer cidadão (eleitor). Protege: patrimônio público, moralidade administrativa, meio ambiente e patrimônio histórico-cultural. Réu pode ser condenado em honorários se agir de má-fé.',f:'Art. 5º, LXXIII CF/88; Lei 4.717/1965'},
+        ]
+      },
+      {
+        id:'const-ctrl', name:'D. Constitucional', sub:'Controle de Constitucionalidade',
+        icon:'ti-building-arch', cls:'mat-const',
+        exp:`O <strong>controle de constitucionalidade</strong> verifica se normas infraconstitucionais são compatíveis com a Constituição. É como o "controle de qualidade" das leis.<br><br>
+<strong>Controle difuso:</strong> qualquer juiz ou tribunal pode declarar a inconstitucionalidade no caso concreto (incidentalmente). A declaração tem efeito inter partes (só para as partes do processo). O Senado pode suspender a norma com efeitos erga omnes (art. 52, X CF).<br><br>
+<strong>Controle concentrado (STF):</strong><br>
+• <strong>ADI</strong> — impugna lei ou ato normativo federal/estadual por inconstitucionalidade<br>
+• <strong>ADC</strong> — declara a constitucionalidade de lei federal<br>
+• <strong>ADPF</strong> — arguição de descumprimento de preceito fundamental (subsidiariedade)<br>
+• <strong>ADO</strong> — omissão inconstitucional<br>
+Efeitos: erga omnes, vinculante e ex tunc (regra).`,
+        analogia:`Controle difuso é como qualquer fiscal poder autuar uma irregularidade. Controle concentrado é o fiscal-chefe (STF) que decide de uma vez para todos — e a decisão vale para o Brasil inteiro.`,
+        lei:`Arts. 97, 102 e 103 CF/88 · Lei 9.868/1999 (ADI/ADC) · Lei 9.882/1999 (ADPF)`,
+        checklist:[
+          'Sei distinguir controle difuso e concentrado',
+          'Conheço os legitimados para propor ADI (art. 103 CF)',
+          'Sei os efeitos da decisão em ADI (erga omnes, vinculante, ex tunc)',
+          'Entendo a cláusula de reserva de plenário (art. 97 CF)',
+          'Conheço o caráter subsidiário da ADPF',
+        ],
+        cards:[
+          {q:'Quais são os legitimados para propor ADI no STF?',a:'Art. 103 CF: Presidente da República, Mesa do Senado, Mesa da Câmara, Mesa de ALE, Governador de Estado/DF, PGR, Conselho Federal da OAB, partido político com representação no CN e confederação sindical/entidade de classe de âmbito nacional.',f:'Art. 103 CF/88'},
+          {q:'O que é a cláusula de reserva de plenário?',a:'Art. 97 CF: somente pelo voto da maioria absoluta dos membros do tribunal (ou do órgão especial) pode ser declarada a inconstitucionalidade de lei. Viola o due process se a turma decide sozinha.',f:'Art. 97 CF/88; Súmula Vinculante 10 STF'},
+          {q:'Qual a diferença entre os efeitos do controle difuso e concentrado?',a:'Difuso: inter partes (só entre as partes), ex tunc. Concentrado (ADI/ADC): erga omnes (todos), vinculante (demais órgãos do Judiciário e Executivo), ex tunc — salvo modulação dos efeitos.',f:'Arts. 27 e 28 Lei 9.868/1999'},
+          {q:'Quando cabe ADPF?',a:'Quando houver descumprimento de preceito fundamental da CF e não houver outro meio eficaz (subsidiariedade). Alcança atos municipais e normas pré-constitucionais, o que ADI não alcança.',f:'Art. 1º Lei 9.882/1999'},
+        ]
+      }
+    ]
+  },
+  {
+    label:'Quinta-feira', date:'18/06', title:'D. Tributário + D. Administrativo',
+    materias:[
+      {
+        id:'trib-esp', name:'D. Tributário', sub:'Espécies tributárias',
+        icon:'ti-receipt-tax', cls:'mat-trib',
+        exp:`As <strong>espécies tributárias</strong> são as formas em que o tributo se manifesta. O CTN adota a teoria tripartite (impostos, taxas e contribuições de melhoria), mas o STF reconhece a teoria pentapartite: acrescenta empréstimos compulsórios e contribuições especiais.<br><br>
+<strong>Imposto:</strong> não vinculado a atividade estatal específica. Ex: IR, IPTU, ICMS.<br>
+<strong>Taxa:</strong> vinculada a serviço público específico e divisível ou ao exercício regular do poder de polícia.<br>
+<strong>Contribuição de melhoria:</strong> vinculada a obra pública que gera valorização imobiliária.<br>
+<strong>Empréstimo compulsório:</strong> só por LC federal, restituível; calamidade pública ou guerra.<br>
+<strong>Contribuições especiais:</strong> CSLL, COFINS, contribuições previdenciárias — destinação específica.`,
+        analogia:`Imposto é como o condomínio onde você paga mas não escolhe o que vai ser feito com o dinheiro. Taxa é como pagar pelo uso da piscina — serviço específico para você. Contribuição de melhoria é como dividir o custo da reforma que valorizou seu apartamento.`,
+        lei:`Arts. 145, 148 e 149 CF/88 · Arts. 3º, 5º, 16, 77 e 81 CTN · Súmula Vinculante 29 STF`,
+        checklist:[
+          'Sei distinguir as 5 espécies tributárias',
+          'Conheço os requisitos da taxa (serviço específico e divisível)',
+          'Sei que empréstimo compulsório exige lei complementar',
+          'Entendo a diferença entre imposto vinculado e não vinculado',
+          'Conheço os limites da contribuição de melhoria (custo da obra)',
+        ],
+        cards:[
+          {q:'Quais são as 5 espécies tributárias segundo o STF?',a:'Impostos, taxas, contribuições de melhoria, empréstimos compulsórios e contribuições especiais (teoria pentapartite).',f:'Arts. 145, 148 e 149 CF/88; CTN'},
+          {q:'Taxa pode ser cobrada por serviço potencial?',a:'Sim, se o serviço for de utilização compulsória e posto à disposição (ex: coleta de lixo domiciliar — Súmula Vinculante 19 STF). Serviço apenas potencial + facultativo = inconstitucional.',f:'Art. 145, II CF; SV 19 STF'},
+          {q:'Empréstimo compulsório tem que ser restituído?',a:'Sim, é tributo restituível. Só pode ser instituído por lei complementar federal em casos de calamidade pública, guerra ou investimento público urgente (art. 148 CF). A aplicação é vinculada à despesa que o motivou.',f:'Art. 148 CF/88'},
+          {q:'Qual o limite para a contribuição de melhoria?',a:'Duplo limite: individual (não pode superar a valorização individual do imóvel) e global (não pode superar o custo total da obra). O contribuinte não pode ser enriquecimento do Estado.',f:'Art. 81 CTN'},
+        ]
+      },
+      {
+        id:'trib-cred', name:'D. Tributário', sub:'Crédito tributário',
+        icon:'ti-coin-euro', cls:'mat-trib',
+        exp:`O <strong>crédito tributário</strong> é o vínculo jurídico que confere ao Estado o direito de exigir o tributo do sujeito passivo. Nasce com o <strong>lançamento</strong> — ato administrativo que constitui o crédito.<br><br>
+<strong>Modalidades de lançamento:</strong><br>
+• <strong>De ofício</strong>: feito pela autoridade fiscal (IPTU, IPVA)<br>
+• <strong>Por declaração</strong>: contribuinte informa, Fisco lança (ITBI)<br>
+• <strong>Por homologação</strong>: contribuinte calcula e paga, Fisco homologa (IR, ICMS, IPI)<br><br>
+<strong>Suspensão do crédito (art. 151 CTN — "MODEPAR"):</strong> Moratória, Depósito integral, Reclamações/recursos, Concessão de liminar/tutela, Parcelamento.<br><br>
+<strong>Extinção (art. 156 CTN):</strong> pagamento, compensação, transação, remissão, prescrição, decadência, conversão do depósito.`,
+        analogia:`O crédito tributário é como uma dívida registrada em cartório: só existe oficialmente após o lançamento (o registro). Antes disso, você pode até dever, mas o Estado ainda não tem título para cobrar.`,
+        lei:`Arts. 139 a 193 CTN · Súmula 360 STJ (homologação tácita)`,
+        checklist:[
+          'Sei as 3 modalidades de lançamento tributário',
+          'Conheço o mnemônico MODEPAR para suspensão do crédito',
+          'Sei distinguir prescrição e decadência tributária',
+          'Conheço as causas de extinção do crédito (art. 156 CTN)',
+          'Sei o prazo decadencial para lançamento (5 anos)',
+        ],
+        cards:[
+          {q:'Qual a diferença entre prescrição e decadência no direito tributário?',a:'Decadência: prazo de 5 anos para o Fisco realizar o lançamento (constituir o crédito). Prescrição: prazo de 5 anos para o Fisco cobrar judicialmente o crédito já constituído.',f:'Arts. 150 e 173 CTN'},
+          {q:'O que suspende a exigibilidade do crédito tributário? (MODEPAR)',a:'Moratória, depósito do montante integral, reclamações e recursos administrativos, concessão de medida liminar/tutela antecipada e parcelamento.',f:'Art. 151 CTN'},
+          {q:'No lançamento por homologação, quando ocorre a homologação tácita?',a:'Após 5 anos do fato gerador, sem manifestação do Fisco. O tributo declarado e não pago pode ser cobrado diretamente (o lançamento está feito pela declaração — Súmula 436 STJ).',f:'Art. 150, §4º CTN; Súmula 436 STJ'},
+          {q:'O que é substituição tributária para frente (ST progressiva)?',a:'O tributo é cobrado antecipadamente de um contribuinte da cadeia (normalmente o fabricante) sobre fato gerador presumido (que ainda vai ocorrer). Ex: ICMS-ST. Reconhecida pelo STF como constitucional.',f:'Art. 150, §7º CF/88'},
+        ]
+      },
+      {
+        id:'adm-pod', name:'D. Administrativo', sub:'Poderes da Administração',
+        icon:'ti-building-community', cls:'mat-adm',
+        exp:`Os <strong>poderes administrativos</strong> são instrumentos que o Estado usa para exercer suas funções. São poderes-deveres — a Administração não pode deixar de usá-los quando necessário.<br><br>
+• <strong>Poder vinculado:</strong> lei define todos os elementos do ato (não há margem de escolha). Ex: concessão de aposentadoria por idade com requisitos cumpridos.<br>
+• <strong>Poder discricionário:</strong> lei deixa margem de escolha ao agente (oportunidade e conveniência). Não é arbitrariedade — tem limites legais.<br>
+• <strong>Poder hierárquico:</strong> estrutura interna da Administração — delegar, avocar, rever atos.<br>
+• <strong>Poder disciplinar:</strong> punir agentes e particulares vinculados por contratos administrativos.<br>
+• <strong>Poder regulamentar:</strong> editar decretos e regulamentos (art. 84, IV CF).<br>
+• <strong>Poder de polícia:</strong> limitar direitos individuais em prol do interesse coletivo. É autoexecutório, coercitivo e indelegável (em regra).`,
+        analogia:`Os poderes da Administração são como as ferramentas de um médico: existem para curar (servir ao interesse público), não para causar dano. Usar a ferramenta errada ou sem necessidade é abuso de poder — e isso anula o ato.`,
+        lei:`Arts. 2º e 27 Lei 9.784/1999 · Art. 78 CTN (poder de polícia) · Art. 84, IV e VI CF/88`,
+        checklist:[
+          'Sei distinguir poder vinculado e discricionário',
+          'Conheço os atributos do poder de polícia (autoexecutoriedade, coercibilidade)',
+          'Sei que poder discricionário não é arbitrariedade',
+          'Entendo a diferença entre abuso de poder e desvio de finalidade',
+          'Conheço o poder regulamentar e seus limites',
+        ],
+        cards:[
+          {q:'Quais são os atributos do poder de polícia?',a:'Discricionariedade (em regra), autoexecutoriedade (independe do Judiciário para agir) e coercibilidade (imposição coativa). Pode ser delegado a pessoas jurídicas de direito público, mas atos de coerção não.',f:'Art. 78 CTN; Tema 532 STF'},
+          {q:'O que é desvio de finalidade (ou desvio de poder)?',a:'Uso do poder administrativo para fim diverso do previsto em lei (mesmo que o fim seja público). Causa nulidade do ato. Ex: desapropriação para perseguir inimigo político.',f:'Art. 2º, parágrafo único, e, Lei 9.784/1999'},
+          {q:'Qual a diferença entre delegação e avocação?',a:'Delegação: superior transfere competência a subordinado (temporária, não transfere a titularidade, publicada em DOU). Avocação: superior chama para si competência do subordinado (excepcional, motivada).',f:'Arts. 11 a 15 Lei 9.784/1999'},
+          {q:'O poder disciplinar alcança particulares?',a:'Só os particulares que mantenham vínculo específico com a Administração (concessionários, contratados). Não alcança o cidadão comum — para esse, há o poder de polícia.',f:'Art. 78 e ss. Lei 8.112/1990 (analogia)'},
+        ]
+      }
+    ]
+  },
+  {
+    label:'Sexta-feira', date:'19/06', title:'Processo Civil',
+    materias:[
+      {
+        id:'proc-suj', name:'Processo Civil', sub:'Sujeitos do processo (partes e procuradores, litisconsórcio, intervenção de terceiros)',
+        icon:'ti-users', cls:'mat-proc',
+        exp:`Os <strong>sujeitos do processo</strong> são todos que participam da relação processual. As <strong>partes</strong> são autor e réu; os <strong>procuradores</strong> são os advogados com poderes de representação.<br><br>
+<strong>Litisconsórcio</strong> é a pluralidade de partes num mesmo polo. Pode ser:<br>
+• Ativo (vários autores) / Passivo (vários réus) / Misto<br>
+• Facultativo (escolha das partes) / Necessário (lei ou natureza exige — art. 114 CPC)<br>
+• Simples (decisão pode ser diferente para cada um) / Unitário (decisão deve ser uniforme)<br><br>
+<strong>Intervenção de terceiros (CPC/2015):</strong><br>
+• <strong>Assistência</strong> (simples e litisconsorcial)<br>
+• <strong>Denunciação da lide</strong><br>
+• <strong>Chamamento ao processo</strong><br>
+• <strong>Incidente de desconsideração da PJ</strong><br>
+• <strong>Amicus curiae</strong>`,
+        analogia:`O litisconsórcio é como um grupo de amigos que entram juntos numa ação coletiva de consumo. Quando a decisão tem que ser igual para todos (ex: anular um contrato comum), é unitário. Quando cada um pode ganhar ou perder separado, é simples.`,
+        lei:`Arts. 71 a 138 CPC/2015 · Arts. 113, 114, 119 a 124 CPC/2015`,
+        checklist:[
+          'Sei distinguir litisconsórcio necessário e facultativo',
+          'Sei distinguir litisconsórcio simples e unitário',
+          'Conheço as 5 modalidades de intervenção de terceiros no CPC/2015',
+          'Entendo quando cabe denunciação da lide',
+          'Sei os requisitos do amicus curiae',
+        ],
+        cards:[
+          {q:'Quando o litisconsórcio é necessário?',a:'Quando a lei expressamente determinar ou quando a natureza da relação jurídica exigir decisão uniforme para todos. A ausência de litisconsorte necessário leva à extinção do processo sem mérito.',f:'Art. 114 CPC/2015'},
+          {q:'Qual a diferença entre assistência simples e litisconsorcial?',a:'Simples: terceiro tem interesse jurídico indireto; fica subordinado à parte principal. Litisconsorcial: terceiro tem relação jurídica com o adversário da parte; atua como se fosse litisconsorte (independente).',f:'Arts. 119 e 124 CPC/2015'},
+          {q:'Quando cabe denunciação da lide?',a:'Quando o réu (ou autor) tiver direito de regresso contra terceiro em caso de perda. Ex: réu denuncia a lide à seguradora. Deve ser feita junto com a contestação.',f:'Art. 125 CPC/2015'},
+          {q:'O que é o chamamento ao processo?',a:'Modalidade pela qual o réu chama codevedor solidário para integrar o processo como litisconsorte passivo. Diferente da denunciação — aqui o chamado responde junto, não em regresso.',f:'Art. 130 CPC/2015'},
+        ]
+      },
+      {
+        id:'proc-com', name:'Processo Civil', sub:'Procedimento comum',
+        icon:'ti-list-check', cls:'mat-proc',
+        exp:`O <strong>procedimento comum</strong> (arts. 318-512 CPC/2015) é o rito padrão do processo de conhecimento — aplica-se quando não houver procedimento especial previsto.<br><br>
+<strong>Fases:</strong> postulatória (petição inicial + citação + contestação) → saneamento → instrutória (audiência de instrução) → decisória (sentença).<br><br>
+<strong>Contestação:</strong> prazo de 15 dias (30 para Fazenda Pública e MPT). Toda matéria de defesa deve ser alegada na contestação (princípio da eventualidade/concentração da defesa — art. 336 CPC). Defesas preliminares do art. 337 devem ser arguidas antes do mérito.<br><br>
+<strong>Revelia:</strong> não contestar no prazo → presunção de veracidade dos fatos (relativa). Não gera revelia quando o direito não admite confissão, há pluralidade de réus e um contestou, ou o fato exige prova documental.`,
+        analogia:`O procedimento comum é como uma receita de bolo com etapas definidas: você não pode colocar o recheio antes de assar a massa. Cada fase tem sua função — e pular etapas tem consequências processuais sérias.`,
+        lei:`Arts. 318 a 512 CPC/2015 · Arts. 335, 336, 337, 344 CPC/2015`,
+        checklist:[
+          'Conheço as fases do procedimento comum',
+          'Sei o prazo de contestação (15 dias, 30 para FP e MPT)',
+          'Entendo o princípio da eventualidade na contestação',
+          'Conheço as defesas preliminares do art. 337 CPC',
+          'Sei os efeitos da revelia e suas exceções',
+        ],
+        cards:[
+          {q:'Qual o prazo para contestar no procedimento comum e quais as exceções?',a:'15 dias úteis (regra). 30 dias: Fazenda Pública, MP, Defensoria Pública e litisconsortes com advogados diferentes.',f:'Arts. 335 e 180 CPC/2015'},
+          {q:'O que é o princípio da eventualidade na contestação?',a:'O réu deve alegar toda a matéria de defesa de uma só vez na contestação, sob pena de preclusão (art. 336 CPC). Não pode guardar defesas para depois — tudo vai junto, como "por acaso todas forem necessárias".',f:'Art. 336 CPC/2015'},
+          {q:'Quando a revelia não produz efeito de presunção de veracidade?',a:'1) Direito indisponível; 2) Pluralidade de réus e um contestou quanto a fato comum; 3) Petição inicial não acompanhada de instrumento obrigatório.',f:'Art. 345 CPC/2015'},
+          {q:'Quais são as defesas preliminares do art. 337 CPC?',a:'Inexistência/nulidade de citação, incompetência absoluta/relativa, incorreção do valor da causa, inépcia da PI, perempção, litispendência, coisa julgada, conexão, incapacidade da parte, falta de representação, convenção de arbitragem, carência da ação e falta de caução.',f:'Art. 337 CPC/2015'},
+        ]
+      }
+    ]
+  },
+  {
+    label:'Sábado', date:'20/06', title:'Descanso',
+    especial: true,
+    tipo: 'descanso'
+  },
+  {
+    label:'Domingo', date:'21/06', title:'Simulado 02',
+    especial: true,
+    tipo: 'simulado'
+  }
+];
+
+let checks = {};
+let fcStates = {};
+
+function totalItems(){
+  let t=0;
+  DAYS.forEach(d=>{
+    if(d.materias) d.materias.forEach(m=>{ t += m.checklist.length; });
+  });
+  return t;
+}
+
+function doneItems(){
+  return Object.values(checks).filter(Boolean).length;
+}
+
+function updateGlobal(){
+  const total = totalItems();
+  const done = doneItems();
+  const pct = total>0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('g-done').textContent = done;
+  document.getElementById('g-total').textContent = total;
+  document.getElementById('g-pct').textContent = pct+'%';
+  document.getElementById('gbar').style.width = pct+'%';
+}
+
+function dayDone(dayIdx){
+  const d = DAYS[dayIdx];
+  if(!d.materias) return false;
+  let total=0, done=0;
+  d.materias.forEach(m=>{
+    m.checklist.forEach((c,i)=>{
+      total++;
+      if(checks[m.id+'-'+i]) done++;
+    });
+  });
+  return total>0 && done===total;
+}
+
+function dayProgress(dayIdx){
+  const d = DAYS[dayIdx];
+  if(!d.materias) return {done:0,total:0};
+  let total=0, done=0;
+  d.materias.forEach(m=>{
+    m.checklist.forEach((c,i)=>{
+      total++;
+      if(checks[m.id+'-'+i]) done++;
+    });
+  });
+  return {done,total};
+}
+
+function updateDayNav(){
+  document.querySelectorAll('.dnb').forEach((btn,i)=>{
+    if(dayDone(i)) btn.classList.add('done');
+    else btn.classList.remove('done');
+  });
+}
+
+function buildRing(dayIdx){
+  const {done,total} = dayProgress(dayIdx);
+  const pct = total>0 ? done/total : 0;
+  const r=22, circ=2*Math.PI*r;
+  const offset = circ*(1-pct);
+  const pctTxt = Math.round(pct*100)+'%';
+  return `<div class="day-prog-wrap">
+    <div class="day-prog-label">progresso</div>
+    <div class="day-prog-ring">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <circle class="ring-bg" cx="26" cy="26" r="${r}"/>
+        <circle class="ring-fg" cx="26" cy="26" r="${r}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" id="ring-fg-${dayIdx}"/>
+      </svg>
+      <div class="ring-txt" id="ring-txt-${dayIdx}">${pctTxt}</div>
+    </div>
+  </div>`;
+}
+
+function updateRing(dayIdx){
+  const {done,total} = dayProgress(dayIdx);
+  const pct = total>0 ? done/total : 0;
+  const r=22, circ=2*Math.PI*r;
+  const offset = circ*(1-pct);
+  const fg = document.getElementById('ring-fg-'+dayIdx);
+  const txt = document.getElementById('ring-txt-'+dayIdx);
+  if(fg) fg.setAttribute('stroke-dashoffset', offset.toFixed(1));
+  if(txt) txt.textContent = Math.round(pct*100)+'%';
+}
+
+function buildMateria(m, dayIdx){
+  const cards = m.cards||[];
+  const fcId = m.id;
+  if(!fcStates[fcId]) fcStates[fcId]={cur:0,flipped:false};
+
+  const checkItems = m.checklist.map((c,i)=>{
+    const key = m.id+'-'+i;
+    const isChecked = checks[key]||false;
+    const boxCls = isChecked ? 'cl-box checked' : 'cl-box';
+    const txtCls = isChecked ? 'cl-text done' : 'cl-text';
+    return '<div class="cl-item" onclick="toggleCheck(\'' + key + '\',' + dayIdx + ')">'
+      + '<div class="' + boxCls + '" id="box-' + key + '"></div>'
+      + '<div class="' + txtCls + '" id="txt-' + key + '">' + c + '</div>'
+      + '</div>';
+  }).join('');
+
+  const curCard = cards[0]||{q:'',a:'',f:''};
+
+  return `<div class="materia-block" id="mb-${m.id}">
+    <div class="materia-header" onclick="toggleMateria('${m.id}')">
+      <div class="mh-left">
+        <div class="mat-icon ${m.cls}"><i class="ti ${m.icon}"></i></div>
+        <div>
+          <div class="mat-name">${m.name}</div>
+          <div class="mat-sub">${m.sub}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="mat-check-count" id="cc-${m.id}">0/${m.checklist.length}</span>
+        <i class="ti ti-chevron-down mat-chevron" id="chev-${m.id}"></i>
+      </div>
+    </div>
+    <div class="materia-body" id="body-${m.id}">
+      <div class="explicacao">
+        <div class="exp-label">Entendendo o tema</div>
+        <div class="exp-text">${m.exp}</div>
+        ${m.analogia?`<div class="analogia-box"><div class="analogia-icon"><i class="ti ti-bulb"></i></div><div class="analogia-text"><strong>Analogia:</strong> ${m.analogia}</div></div>`:''}
+        <div class="lei-box"><div class="lei-label">Base legal</div><div class="lei-text">${m.lei}</div></div>
+      </div>
+      <div class="checklist">
+        <div class="cl-label">Checklist de revisão</div>
+        ${checkItems}
+      </div>
+      ${cards.length>0?`<div class="fc-section">
+        <div class="fc-label">Flashcards</div>
+        <div class="fc-controls">
+          <span class="fc-counter" id="fc-cnt-${fcId}">1 / ${cards.length}</span>
+          <button class="fc-btn" onclick="shuffleFC('${fcId}')"><i class="ti ti-arrows-shuffle" style="font-size:13px"></i> embaralhar</button>
+        </div>
+        <div class="fc-scene" id="fcs-${fcId}" onclick="flipFC('${fcId}')">
+          <div class="fc-inner" id="fci-${fcId}">
+            <div class="fc-face">
+              <div class="fc-q" id="fcq-${fcId}">${cards[0].q}</div>
+              <div class="fc-hint"><i class="ti ti-rotate" style="font-size:12px"></i> clique para virar</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-a-label">Resposta</div>
+              <div class="fc-a" id="fca-${fcId}">${cards[0].a}</div>
+              <div class="fc-fund" id="fcf-${fcId}">${cards[0].f}</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-nav">
+          <button class="fc-nav-btn" id="fcprev-${fcId}" onclick="fcGo('${fcId}',-1)" disabled><i class="ti ti-arrow-left" style="font-size:13px"></i> Anterior</button>
+          <div class="fc-mark">
+            <button class="fc-yes" onclick="fcMark('${fcId}',true)"><i class="ti ti-check" style="font-size:12px"></i> Sei</button>
+            <button class="fc-no" onclick="fcMark('${fcId}',false)"><i class="ti ti-x" style="font-size:12px"></i> Revisar</button>
+          </div>
+          <button class="fc-nav-btn" id="fcnext-${fcId}" onclick="fcGo('${fcId}',1)">Próximo <i class="ti ti-arrow-right" style="font-size:13px"></i></button>
+        </div>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+function buildDay(dayIdx){
+  const d = DAYS[dayIdx];
+  if(d.especial){
+    const isDescanso = d.tipo==='descanso';
+    return `<div class="day-panel" id="day-${dayIdx}">
+      <div class="day-header">
+        <div class="day-title-group">
+          <div class="day-label">${d.label}</div>
+          <div class="day-title">${d.title}</div>
+          <div class="day-date">Dia ${d.date}</div>
+        </div>
+      </div>
+      <div class="special-card">
+        <div class="special-icon"><i class="ti ${isDescanso?'ti-moon-stars':'ti-clipboard-list'}"></i></div>
+        <div class="special-title">${isDescanso?'Dia de descanso':'Simulado 02'}</div>
+        <div class="special-text">${isDescanso
+          ? 'Você estudou muito esta semana. O descanso é parte do aprendizado — o cérebro consolida memória durante o repouso. Descanse com intenção.'
+          : 'Hora de testar tudo que você revisou esta semana! Faça o simulado com seriedade: cronometre, não consulte o material e revise cada erro com calma depois.'
+        }</div>
+        <div class="special-tips">${isDescanso
+          ? ['Evite estudar material novo hoje','Faça algo que você goste — passeio, filme, família','Hidrate-se bem e durma cedo','Revisão leve de flashcards por 15min é o máximo permitido','Você merece esse descanso — vai sair mais forte amanhã'].map(t=>`<div class="tip-item"><div class="tip-dot"></div><span>${t}</span></div>`).join('')
+          : ['Separe 5h sem interrupção para o simulado','Cronometre cada questão (aprox. 3 min por questão)','Não consulte material durante a prova','Ao terminar, corrija questão por questão e anote dúvidas','Identifique os temas com mais erros para revisão extra'].map(t=>`<div class="tip-item"><div class="tip-dot"></div><span>${t}</span></div>`).join('')
+        }</div>
+      </div>
+    </div>`;
+  }
+
+  const materias = (d.materias||[]).map(m=>buildMateria(m,dayIdx)).join('');
+  return `<div class="day-panel" id="day-${dayIdx}">
+    <div class="day-header">
+      <div class="day-title-group">
+        <div class="day-label">${d.label}</div>
+        <div class="day-title">${d.title}</div>
+        <div class="day-date">Dia ${d.date}</div>
+      </div>
+      ${buildRing(dayIdx)}
+    </div>
+    ${materias}
+  </div>`;
+}
+
+function renderAll(){
+  const container = document.getElementById('main-container');
+  container.innerHTML = DAYS.map((_,i)=>buildDay(i)).join('');
+  document.getElementById('day-0').classList.add('visible');
+  updateCheckCounts();
+  updateGlobal();
+}
+
+function showDay(idx){
+  document.querySelectorAll('.day-panel').forEach(p=>p.classList.remove('visible'));
+  document.querySelectorAll('.dnb').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.getElementById('day-'+idx).classList.add('visible');
+}
+
+document.getElementById('day-nav').addEventListener('click',function(e){
+  const btn=e.target.closest('.dnb');
+  if(!btn) return;
+  showDay(parseInt(btn.dataset.day));
+});
+
+function toggleMateria(id){
+  const body=document.getElementById('body-'+id);
+  const chev=document.getElementById('chev-'+id);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.classList.toggle('open',!isOpen);
+}
+
+function toggleCheck(key,dayIdx){
+  checks[key]=!checks[key];
+  const box=document.getElementById('box-'+key);
+  const txt=document.getElementById('txt-'+key);
+  if(box) box.className='cl-box'+(checks[key]?' checked':'');
+  if(txt) txt.className='cl-text'+(checks[key]?' done':'');
+  updateCheckCounts();
+  updateRing(dayIdx);
+  updateGlobal();
+  updateDayNav();
+}
+
+function updateCheckCounts(){
+  DAYS.forEach(d=>{
+    if(!d.materias) return;
+    d.materias.forEach(m=>{
+      let done=0;
+      m.checklist.forEach((_,i)=>{ if(checks[m.id+'-'+i]) done++; });
+      const el=document.getElementById('cc-'+m.id);
+      if(el) el.textContent=done+'/'+m.checklist.length;
+    });
+  });
+}
+
+function flipFC(id){
+  const scene=document.getElementById('fcs-'+id);
+  if(!scene) return;
+  const st=fcStates[id];
+  st.flipped=!st.flipped;
+  scene.classList.toggle('flipped',st.flipped);
+}
+
+function fcGo(id,dir){
+  const st=fcStates[id];
+  const mat = findMat(id);
+  if(!mat) return;
+  const cards=mat.cards;
+  const n=st.cur+dir;
+  if(n<0||n>=cards.length) return;
+  st.cur=n; st.flipped=false;
+  const scene=document.getElementById('fcs-'+id);
+  if(scene) scene.classList.remove('flipped');
+  document.getElementById('fcq-'+id).textContent=cards[n].q;
+  document.getElementById('fca-'+id).textContent=cards[n].a;
+  document.getElementById('fcf-'+id).textContent=cards[n].f;
+  document.getElementById('fc-cnt-'+id).textContent=(n+1)+' / '+cards.length;
+  document.getElementById('fcprev-'+id).disabled=n===0;
+  document.getElementById('fcnext-'+id).disabled=n===cards.length-1;
+}
+
+function fcMark(id,know){
+  const st=fcStates[id];
+  const mat=findMat(id);
+  if(!mat) return;
+  if(st.cur<mat.cards.length-1) fcGo(id,1);
+}
+
+function shuffleFC(id){
+  const mat=findMat(id);
+  if(!mat) return;
+  for(let i=mat.cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[mat.cards[i],mat.cards[j]]=[mat.cards[j],mat.cards[i]];}
+  fcStates[id]={cur:0,flipped:false};
+  const scene=document.getElementById('fcs-'+id);
+  if(scene) scene.classList.remove('flipped');
+  document.getElementById('fcq-'+id).textContent=mat.cards[0].q;
+  document.getElementById('fca-'+id).textContent=mat.cards[0].a;
+  document.getElementById('fcf-'+id).textContent=mat.cards[0].f;
+  document.getElementById('fc-cnt-'+id).textContent='1 / '+mat.cards.length;
+  document.getElementById('fcprev-'+id).disabled=true;
+  document.getElementById('fcnext-'+id).disabled=mat.cards.length<=1;
+}
+
+function findMat(id){
+  for(const d of DAYS){
+    if(!d.materias) continue;
+    const m=d.materias.find(m=>m.id===id);
+    if(m) return m;
+  }
+  return null;
+}
+
+renderAll();
+</script>
+
+
+</body>
+</html>
